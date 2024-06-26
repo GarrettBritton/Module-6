@@ -1,11 +1,29 @@
 function searchCity() {
     let cityInput = document.getElementById("city");
-    let city = cityInput.value.trim(); // Trim any leading/trailing whitespace
+    let city = cityInput.value.trim();
 
-    // Construct the API URL for 5-day forecast (daily forecast)
-    let apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
+    let currentWeatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
 
-    fetch(apiUrl)
+    fetch(currentWeatherUrl)
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(function (currentData) {
+            renderTodaysForecast(currentData);
+
+            saveCityToLocalStorage(city);
+        })
+        .catch(function (error) {
+            console.error('Error fetching current weather data:', error);
+            alert('Error fetching current weather data. Please try again later.');
+        });
+
+    let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=40&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
+
+    fetch(forecastUrl)
         .then(function (response) {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -16,59 +34,151 @@ function searchCity() {
             renderForecast(forecastData);
         })
         .catch(function (error) {
-            alert('Error fetching weather data:', error);
+            console.error('Error fetching forecast data:', error);
+            alert('Error fetching forecast data. Please try again later.');
         });
 }
 
-function renderForecast(forecastData) {
-    // Get the forecast container element from the DOM
-    let forecastContainer = document.getElementById("forecast");
-    // Clear any previous forecast data
-    forecastContainer.innerHTML = '';
+function displayStoredCities() {
+    let citiesContainer = document.getElementById('storedCities');
+    citiesContainer.innerHTML = '';
 
-    // Loop through the forecast data list
-    forecastData.list.forEach(function (forecast) {
-        // Create a div for each forecast item (card)
-        let forecastCard = document.createElement('div');
-        forecastCard.classList.add('card'); // Add a class for styling
 
-        // Extract necessary data from the forecast object (example: date, temperature, weather description, etc.)
-        let date = new Date(forecast.dt * 1000); // Convert timestamp to date object
-        let temperature = forecast.main.temp;
-        // let description = forecast.weather[0].description;
-        let wind = forecast.wind.speed;
-        let humidity = forecast.main.humidity;
+    let cities = JSON.parse(localStorage.getItem('cities')) || [];
 
-        // Create HTML structure for each forecast card
-        let forecastContent = `
-            <p>Date: ${date.toDateString()}</p>
-            <p>Temperature: ${temperature} F</p>
-            <p>Humidity: ${humidity}%<p>
-            <p>Wind: ${wind} MPH<p>
-        `;
 
-        // <p>Description: ${description}</p>
+    cities.forEach(function (city) {
+        let cityButton = document.createElement('button');
+        cityButton.textContent = city;
+        cityButton.classList.add('stored-city-btn');
+        cityButton.addEventListener('click', function () {
 
-        // Set the HTML content of the forecast card
-        forecastCard.innerHTML = forecastContent;
+            document.getElementById('city').value = city;
 
-        // Append forecast card to forecast container
-        forecastContainer.appendChild(forecastCard);
+            searchCity();
+        });
+        citiesContainer.appendChild(cityButton);
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Get the submit button by ID
+function saveCityToLocalStorage(city) {
+
+    let cities = JSON.parse(localStorage.getItem('cities')) || [];
+
+
+    if (!cities.includes(city)) {
+
+        cities.push(city);
+
+        localStorage.setItem('cities', JSON.stringify(cities));
+
+
+        displayStoredCities();
+    }
+}
+
+function renderTodaysForecast(currentData) {
+
+    let todaysForecastContainer = document.getElementById("today");
+    let cityInput = document.getElementById("city");
+    let city = cityInput.value.trim();
+    todaysForecastContainer.innerHTML = '';
+
+    console.log(currentData);
+
+
+    let todaysForecastCard = document.createElement('div');
+    todaysForecastCard.classList.add('card');
+
+
+    let date = new Date(currentData.dt * 1000);
+    let temperature = currentData.main.temp;
+    let wind = currentData.wind.speed;
+    let humidity = currentData.main.humidity;
+    let weatherDescription = currentData.weather[0].description;
+    let iconCode = currentData.weather[0].icon;
+
+    let iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+    let iconImg = `<img src="${iconUrl}" alt="${weatherDescription}" />`;
+
+
+    let todaysForecastContent = `
+        <h2> ${city} (${date.toDateString()}) </h2>
+        <div class="weather-icon">${iconImg}</div>
+        <p>Temperature: ${temperature} F</p>
+        <p>Humidity: ${humidity}%</p>
+        <p>Wind: ${wind} MPH</p>
+    `;
+
+
+    todaysForecastCard.innerHTML = todaysForecastContent;
+
+
+    todaysForecastContainer.appendChild(todaysForecastCard);
+}
+
+function renderForecast(forecastData) {
+
+    let forecastContainer = document.getElementById("forecast");
+
+    forecastContainer.innerHTML = '';
+
+    console.log(forecastData);
+
+
+    for (let i = 3; i < forecastData.list.length; i += 8) {
+        let forecast = forecastData.list[i];
+
+
+        let forecastCard = document.createElement('div');
+        forecastCard.classList.add('card');
+
+
+        let date = new Date(forecast.dt * 1000);
+        let temperature = forecast.main.temp;
+        let wind = forecast.wind.speed;
+        let humidity = forecast.main.humidity;
+        let weatherDescription = forecast.weather[0].description;
+        let iconCode = forecast.weather[0].icon;
+
+        let iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+        let iconImg = `<img src="${iconUrl}" alt="${weatherDescription}" />`;
+
+
+        let forecastContent = `
+            <p>${date.toDateString()}</p>
+            <div class="weather-icon">${iconImg}</div>
+            <p>Temperature: ${temperature} F</p>
+            <p>Humidity: ${humidity}%</p>
+            <p>Wind: ${wind} MPH</p>
+        `;
+
+
+        forecastCard.innerHTML = forecastContent;
+
+
+        forecastContainer.appendChild(forecastCard);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    displayStoredCities();
+
+
     let submitBtn = document.getElementById("submit");
 
-    // Add click event listener to the submit button
-    submitBtn.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent form submission
 
-        // Call your searchCity function
+    submitBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+
+
         searchCity();
     });
 });
+
+
+
 
 
 

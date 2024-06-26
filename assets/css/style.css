@@ -1,10 +1,68 @@
+* {
+    text-align: center;
+    box-sizing: border-box; /* Ensure all elements include padding and border in width/height calculation */
+}
+
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: 300px; /* Adjust width as needed */
+    font-size: 16px;
+}
+
+.searchButton {
+    padding: 20px;
+}
+
+#storedCities {
+    padding: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px; /* Spacing between input and button */
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049; /* Darker shade when hovered */
+}
+
+
 .card {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
+    background-color: gray;
+    color: white;
+}
+
+#forecast.forecast-container .card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 5px;
+    width: calc(20% - 10px);
+    display: inline-block;
+    vertical-align: top; 
+    box-sizing: border-box;
+    background-color: gray;
+    color: white;
+
+}
+
+.weather-icon img {
+    width: 50px;
+    height: 50px;
 }
 
 .card p {
