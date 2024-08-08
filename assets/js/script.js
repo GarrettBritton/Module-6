@@ -2,7 +2,7 @@ function searchCity() {
     let cityInput = document.getElementById("city");
     let city = cityInput.value.trim();
 
-    let currentWeatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
+    let currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
 
     fetch(currentWeatherUrl)
         .then(function (response) {
@@ -21,7 +21,7 @@ function searchCity() {
             alert('Error fetching current weather data. Please try again later.');
         });
 
-    let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=40&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
+    let forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=40&appid=c7a8304448032c1bb1ce4dba5c7a9435&units=imperial`;
 
     fetch(forecastUrl)
         .then(function (response) {
@@ -98,7 +98,7 @@ function renderTodaysForecast(currentData) {
     let weatherDescription = currentData.weather[0].description;
     let iconCode = currentData.weather[0].icon;
 
-    let iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+    let iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
     let iconImg = `<img src="${iconUrl}" alt="${weatherDescription}" />`;
 
 
@@ -141,7 +141,7 @@ function renderForecast(forecastData) {
         let weatherDescription = forecast.weather[0].description;
         let iconCode = forecast.weather[0].icon;
 
-        let iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+        let iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
         let iconImg = `<img src="${iconUrl}" alt="${weatherDescription}" />`;
 
 
